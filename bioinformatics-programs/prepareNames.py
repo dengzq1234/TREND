@@ -3,7 +3,7 @@
 # 03.04/2019
 import sys, getopt
 import re
-from ete2 import Tree
+from ete3 import Tree
 from Bio import SeqIO
 from Bio import Entrez
 import time
@@ -76,12 +76,12 @@ def initialize(argv):
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
-		print "===========ERROR==========\n " + str(e) + USAGE
+		print("===========ERROR==========\n " + str(e) + USAGE)
 		sys.exit(2)
 	try:
 		for opt, arg in opts:
 			if opt in ("-h", "--help"):
-				print USAGE
+				print(USAGE)
 				sys.exit()
 			elif opt in ("-i", "--ifile"):
 				INPUT_FILE = str(arg).strip()
@@ -111,7 +111,7 @@ def initialize(argv):
 				if str(arg).strip().lower() == "false":
 					REMOVE_DASHES = False
 	except Exception as e:
-		print "===========ERROR==========\n " + str(e) + USAGE
+		print("===========ERROR==========\n " + str(e) + USAGE)
 		sys.exit(2)
 
 # basic name changer
@@ -209,9 +209,9 @@ def fetchNamesAndSave():
 		if FETCH_FROM_MIST:
 			proteinIdToSeq, proteinIdToTrueId = fetchFromMistByIds(proteinIdsMultiProc)
 			print("Fetching from MiST finished OK.")
-	except Exception, e:
+	except Exception as e:
 		print("Error while fetching from MiST.")
-		print (e)
+		print(e)
 	finally:
 		try:
 			if FETCH_FROM_NCBI:
@@ -222,9 +222,9 @@ def fetchNamesAndSave():
 				getChangedNamesForSeqsAndSave(handle, proteinIdToSeq, proteinIdToTrueId)
 			else:
 				getChangedNamesForSeqsAndSave(handle=handle)
-		except Exception, e:
+		except Exception as e:
 			print("Error while fetching from NCBI.")
-			print (e)
+			print(e)
 			if FETCH_FROM_MIST and proteinIdToSeq:
 				getChangedNamesForSeqsAndSave(handle, proteinIdToSeq, proteinIdToTrueId)
 		finally:
@@ -297,7 +297,7 @@ def fetchSequencesForTreeAndSave(treeObject):
 		fullProteinName = REGEX_NUMBER_UNDERSCORE.sub("", originalProteinName)
 		fullProteinNameSplitted = fullProteinName.split("_")
 
- 		partProteinName = fullProteinNameSplitted[0].strip()
+		partProteinName = fullProteinNameSplitted[0].strip()
 		proteinIds2.add(partProteinName)
 		proteinIdsToOrigNames2[partProteinName].add(originalProteinName)
 
@@ -353,7 +353,7 @@ def fetchSequencesAndGetNameToSeqMap(proteinIds, proteinIdsToOrigNames):
 				for name in proteinIdsToOrigNames[eachRecord.id]:
 					seq = str(eachRecord.seq)
 					proteinIdsSeqs[name] = seq
-	except Exception, e:
+	except Exception as e:
 		print(e)
 	finally:
 		if proteinIdsHandle:
@@ -375,8 +375,8 @@ def getHandleOfFetchedSequencesFromNcbi(proteinIds):
 		#handle = Entrez.efetch(db="protein", id="OYV75139.1,ACR67403.1", rettype="fasta", retmode="text")
 		handle = Entrez.efetch(db="protein", id=",".join(proteinIds), rettype="fasta", retmode="text")
 		print("Fetched from NCBI OK")
-	except Exception, e:
-		print ("Couldn't retrieve sequences by id from NCBI in time")
+	except Exception as e:
+		print("Couldn't retrieve sequences by id from NCBI in time")
 		if handle:
 			handle.close()
 	return handle

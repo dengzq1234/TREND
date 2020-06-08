@@ -63,7 +63,7 @@ PROCESS_TYPE = None
 OUTPUT_RPSBLAST_OR_HMMSCAN = "HMMSCAN_RESULT"
 OUTPUT_RPSBPROC = "RPSBPROC_RESULT"
 OUTPUT_TMHMMSCAN = "TMHMMSCan_RESULT"
-HMMSCAN_DB_PATH = "/home/vadim/UTOakRidge/Soft/hmmer3_data/Pfam31/Pfam-A.hmm"
+HMMSCAN_DB_PATH = "/home/ziqi/src/hmmer3_data/Pfam31/Pfam-A.hmm"
 RPSBLAST_DB_PATH = "/home/vadim/Softs/rpsblastdb/"
 RPSBPROC_DB_PATH = "/home/vadim/Softs/rpsbproc/data/Cdd_NCBI"
 DB_NAME = ""
@@ -100,12 +100,12 @@ def initialyze(argv):
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
-		print "===========ERROR==========\n " + str(e) + USAGE
+		print("===========ERROR==========\n " + str(e) + USAGE)
 		sys.exit(2)
 	try:
 		for opt, arg in opts:
 			if opt == '-h':
-				print USAGE
+				print(USAGE)
 				sys.exit()
 			elif opt in ("-i", "--ifile"):
 				INPUT_FILE_FASTA = str(arg).strip()
@@ -178,7 +178,7 @@ def initialyze(argv):
 			if OUTPUT_RPSBLAST_OR_HMMSCAN == None or OUTPUT_RPSBPROC == None:
 				raise Exception("-r and -f (||--ofourth and --ofifth) are both mandatory parameters if -p(||--iprocess) is 'rpsblast'")
 	except Exception as e:
-		print "===========ERROR==========\n " + str(e) + USAGE
+		print("===========ERROR==========\n " + str(e) + USAGE)
 		sys.exit(2)
 
 class Protein(object):
@@ -319,6 +319,7 @@ def processHmmscan():
 	regex = re.compile(r"\s")
 	try:
 		with open(OUTPUT_RPSBLAST_OR_HMMSCAN, "r") as hmmscanFile:
+			#print(PROTEINS_TO_SEQUENCES)
 			for record in hmmscanFile:
 				#Will work only if words in protein names do not have spaces
 				if proteinObject and not len(proteinObject.sequence) and currentQuery:
@@ -327,14 +328,19 @@ def processHmmscan():
 				recSplitted = record.split(":")
 				if recSplitted[0] == "Query":
 					proteinAndLengthList = recSplitted[1].rpartition("[")
+					
 					#If record is UniprotKb; need to investigate this
-					if "|" in recSplitted[1]:
-						if recSplitted[1][:2] == 'tr':
-							currentQuery = proteinAndLengthList[0].split("|")[2].strip()
-						else:
-							currentQuery = proteinAndLengthList[0].split("|")[3].strip()
-					else:
-						currentQuery = proteinAndLengthList[0].strip()
+					
+					# if "|" in recSplitted[1]:
+					# 	recSplitted[1] = recSplitted[1].replace(' ','')
+					# 	if recSplitted[1][:2] == 'tr':
+					# 		currentQuery = proteinAndLengthList[0].split("|")[2].strip()
+					# 	else:
+					# 		currentQuery = proteinAndLengthList[0].split("|")[3].strip()
+					# else:
+					# 	currentQuery = proteinAndLengthList[0].strip()
+					currentQuery = proteinAndLengthList[0].strip()
+					#print(currentQuery)
 					proteinlen = proteinAndLengthList[2].strip().rstrip("]")
 					PROT_NAME_TO_LENGTH[currentQuery] = proteinlen
 					if GET_JSON:
@@ -372,9 +378,9 @@ def processHmmscan():
 					if record == "Alignments for each domain:" or record == "Internal pipeline statistics summary:":
 						hitFound = False
 						domainListBegan = False
-	except Exception, e:
-		print "Problem happened: ", traceback.print_exc()
-		print "record", record
+	except Exception as e:
+		print("Problem happened: ", traceback.print_exc())
+		print("record", record)
 	finally:
 		hmmscanFile.close()
 
@@ -463,9 +469,12 @@ def processSegmasker():
 def formatSequence(sequence):
 	stringWithSpaceChars = ""
 	piece = int(math.floor(len(sequence)/SEQUENCE_LINE_LEN))
-	for ind in xrange(piece):
-		stringWithSpaceChars = stringWithSpaceChars + " " + sequence[ind*SEQUENCE_LINE_LEN:(ind+1)*SEQUENCE_LINE_LEN]
-	return (stringWithSpaceChars + " " + sequence[(ind+1)*SEQUENCE_LINE_LEN:]).strip()
+	if piece == 0:
+		return (stringWithSpaceChars + " " + sequence[(piece+1)*SEQUENCE_LINE_LEN:]).strip()
+	else:
+		for ind in range(piece):
+			stringWithSpaceChars = stringWithSpaceChars + " " + sequence[ind*SEQUENCE_LINE_LEN:(ind+1)*SEQUENCE_LINE_LEN]
+		return (stringWithSpaceChars + " " + sequence[(ind+1)*SEQUENCE_LINE_LEN:]).strip()
 
 def addFastaToDict():
 	with open(INPUT_FILE_FASTA, "r") as seqs:
@@ -481,8 +490,8 @@ def main(argv):
 	elif PROCESS_TYPE == RPSBLAST:
 		rpsBlast()
 		processRpsbproc()
-	tmhmm2scan()
-	processTmscan()
+	#tmhmm2scan()
+	#processTmscan()
 	if RUN_SEGMASKER:
 		segMasker()
 		processSegmasker()
@@ -543,7 +552,7 @@ def rpsBlast():
 	runSubProcess(" ".join([rpsbproc, "-d", RPSBPROC_DB_PATH, "-i", OUTPUT_RPSBLAST_OR_HMMSCAN, "-o", OUTPUT_RPSBPROC]))
 
 def tmhmm2scan():
-	tmhmm = "/home/vadim/Softs/tmhmm-2.0c/bin/tmhmm"
+	tmhmm = "/home/ziqi/src/tmhmm-2.0c/bin/tmhmm"
 	if TMHMMSCAN_PROGRAM != None:
 		tmhmm = TMHMMSCAN_PROGRAM
 	runSubProcess(" ".join([tmhmm, "--short", INPUT_FILE_FASTA, ">", OUTPUT_TMHMMSCAN]))
@@ -557,9 +566,9 @@ def segMasker():
 def runSubProcess(command):
 	try:
 		call(command, shell=True)
-	except OSError, osError:
-		print "osError " + osError
-		print traceback.print_exc()
+	except OSError as osError:
+		print("osError " + osError)
+		print(traceback.print_exc())
 
 
 if __name__ == "__main__":

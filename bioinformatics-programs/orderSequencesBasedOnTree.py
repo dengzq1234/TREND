@@ -2,7 +2,7 @@
 import sys, getopt, json, collections, re
 import copy
 from Bio import Phylo, SeqIO
-from ete2 import Tree, SeqMotifFace, TreeStyle, add_face_to_node
+from ete3 import Tree, SeqMotifFace, TreeStyle, add_face_to_node
 
 USAGE = "\nThis script enumerates protein sequence names on the provided phylogenetic tree and in the file with aligned proteins\n" + \
 "It additionally saves phylogenetic tree with changed protein names in newick format\n\n" + "python" + sys.argv[0] + '''
@@ -33,11 +33,11 @@ def initialyze(argv):
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
-		print "===========ERROR==========\n " + str(e) + USAGE
+		print("===========ERROR==========\n " + str(e) + USAGE)
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt == '-h':
-			print USAGE
+			print(USAGE)
 			sys.exit()
 		elif opt in ("-s", "--ialigned"):
 			SEQS_ALIGNED = str(arg).strip()

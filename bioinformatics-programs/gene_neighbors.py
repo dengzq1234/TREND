@@ -4,7 +4,7 @@ import re
 import urllib
 import json
 import random
-from ete2 import Tree
+from ete3 import Tree
 import math
 import multiprocessing
 
@@ -64,12 +64,12 @@ def initialize(argv):
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
-		print "===========ERROR==========\n " + str(e) + USAGE
+		print("===========ERROR==========\n " + str(e) + USAGE)
 		sys.exit(2)
 	try:
 		for opt, arg in opts:
 			if opt in ("-h", "--help"):
-				print USAGE
+				print(USAGE)
 				sys.exit()
 			elif opt in ("-i", "--itree"):
 				TREE_FILE = str(arg).strip()
@@ -96,7 +96,7 @@ def initialize(argv):
 			elif opt in ("-o", "--ofile"):
 				OUTPUT_FILE = str(arg).strip()
 	except Exception as e:
-		print "===========ERROR==========\n " + str(e) + USAGE
+		print("===========ERROR==========\n " + str(e) + USAGE)
 		sys.exit(2)
 
 	random.seed(RANDOM_SEED)
@@ -178,19 +178,19 @@ def getGeneNeighborsAndPrepareDomains(mainGeneDict, duplicateCounter, fullProtei
 def identifyIfBelongToOperon(previousGene, currentGene, operonCounter, usedAsColourIndex):
 	if previousGene and currentGene:
 		if previousGene["strand"] == currentGene["strand"]:
-		    distance = currentGene["start"] - previousGene["stop"]
-		    if distance > 0:
-		        if distance <= OPERON_TOLERANCE:
-		            previousGene["operon"] = operonCounter
-		            currentGene["operon"] = operonCounter
-		            previousGene["operonColour"] = OPERON_COLOR_DICT[operonCounter]
-		            currentGene["operonColour"] = OPERON_COLOR_DICT[operonCounter]
-		            usedAsColourIndex = True
-		        else:
+			distance = currentGene["start"] - previousGene["stop"]
+			if distance > 0:
+				if distance <= OPERON_TOLERANCE:
+					previousGene["operon"] = operonCounter
+					currentGene["operon"] = operonCounter
+					previousGene["operonColour"] = OPERON_COLOR_DICT[operonCounter]
+					currentGene["operonColour"] = OPERON_COLOR_DICT[operonCounter]
+					usedAsColourIndex = True
+				else:
 					if usedAsColourIndex:
 						operonCounter+=1
 						usedAsColourIndex = False
-		    else:
+			else:
 				previousGene["operon"] = operonCounter
 				currentGene["operon"] = operonCounter
 				previousGene["operonColour"] = OPERON_COLOR_DICT[operonCounter]
@@ -355,7 +355,7 @@ def getNextColour():
 			v = random.random()
 			newColor = hsv_to_rgb(h, s, v)
 			colourCounter = 0
-			print "Colour counter exhausted!"
+			print("Colour counter exhausted!")
 
 	SELECTED_COLORS.add(newColor)
 
@@ -404,7 +404,7 @@ def readTreeAndStartProcess():
 		proteinIds1.append(partProteinName)
 		partProteinName = "_".join(fullProteinName.split("_")[0:2]).strip()
 		proteinIds2.append(partProteinName)
- 		partProteinName = fullProteinName.split("_")[0].strip()
+		partProteinName = fullProteinName.split("_")[0].strip()
 		proteinIds3.append(partProteinName)
 		originalNames.append(originalProteinName)
 

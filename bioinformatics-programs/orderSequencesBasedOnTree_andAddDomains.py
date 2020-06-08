@@ -2,7 +2,7 @@
 import sys, getopt, json, collections, re
 import copy
 from Bio import Phylo, SeqIO
-from ete2 import Tree, SeqMotifFace, TreeStyle, add_face_to_node
+from ete3 import Tree, SeqMotifFace, TreeStyle, add_face_to_node
 
 USAGE = "\nThis script enumerates protein sequence names on the provided phylogenetic tree and in the file with aligned proteins\n" + \
 "and creates phylogenetic tree in svg format with protein domains after branches.\n" + \
@@ -76,11 +76,11 @@ def initialyze(argv):
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
-		print "===========ERROR==========\n " + str(e) + USAGE
+		print("===========ERROR==========\n " + str(e) + USAGE)
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt == '-h':
-			print USAGE
+			print(USAGE)
 			sys.exit()
 		elif opt in ("-i", "--isequence"):
 			SEQS = str(arg).strip()
@@ -347,7 +347,7 @@ def addThinLines(proteinName, domains, startsToDomainList):
 	# Used for taking care of situations when transmembrane domain is in the protein domain
 	tempDom1End = None
 	lastSmallDomainInBiggerDomain = False
-	for ind in xrange(len(domsStartsSorted)-1):
+	for ind in range(len(domsStartsSorted)-1):
 		if len(startsToDomainList[domsStartsSorted[ind]]) == 1:
 			# If not TM domain inside the protien domain was encountered
 			if tempDom1End == None:
@@ -355,7 +355,7 @@ def addThinLines(proteinName, domains, startsToDomainList):
 				dom1End = startsToDomainList[dom1Start][0]
 				dom2Start = domsStartsSorted[ind+1]
 				dom2End = startsToDomainList[dom2Start][0]
-			# If previous TM domain was inside the protein domain
+			# If previous TM domain was inside the 	 domain
 			else:
 				dom1Start = domsStartsSorted[ind]
 				dom1End = tempDom1End
@@ -442,7 +442,7 @@ def writeSeqsAndTree():
 	# Change protein names in datas sctrucuters and write protein sequences with changed names to file
 	if SEQS_ALIGNED != None:
 		with open(OUTPUT_ALIGNED_FILENAME, "w") as outputFile:
-			for i in xrange(len(terminals)):
+			for i in range(len(terminals)):
 				proteinName = terminals[i].name.strip("'")
 				processedName = prepareName(proteinName)
 				if processedName in PROCESSED_TO_ALIGNED_NAMES:
@@ -464,7 +464,7 @@ def writeSeqsAndTree():
 					outputFile.write(">" + terminals[i].name + "\n")
 					outputFile.write(str(ALIGNED_PROTEIN_NAME_TO_SEQ[terminals[i].name]) + "\n")
 	else:
-		for i in xrange(len(terminals)):
+		for i in range(len(terminals)):
 			proteinName = terminals[i].name.strip("'")
 			processedName = prepareName(proteinName)
 			if ENUMERATE:
@@ -495,6 +495,8 @@ def writeSeqsAndTree():
 	if PREDICT_FEATURES:
 		global PROTEIN_DOMAINS_FINAL
 		PROTEIN_DOMAINS_FINAL = copy.deepcopy(PROTEIN_DOMAINS)
+		#print(PROTEIN_DOMAINS_FINAL)
+		#print("#"*50)
 		prepareProteinToDomainsDict()
 	tree.write(outfile=OUTPUT_TREE_NEWICK_FILENAME)
 	treeStyle = TreeStyle()

@@ -125,11 +125,11 @@ def initialyze(argv):
 		if len(opts) == 0:
 			raise getopt.GetoptError("Parameters are required\n")
 	except getopt.GetoptError as e:
-		print "===========ERROR==========\n " + str(e) + USAGE
+		print("===========ERROR==========\n " + str(e) + USAGE)
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt == '-h':
-			print USAGE
+			print(USAGE)
 			sys.exit()
 		elif opt in ("-i", "--isequence"):
 			INPUT_FILE = str(arg).strip()
@@ -383,9 +383,9 @@ def runSubProcess(command, processName):
 			time.sleep(0.05)
 			status = proc.poll()
 		#print "Seems like finished " + processName + " " + str(status)
-	except OSError, osError:
-		print "osError " + osError
-		print traceback.print_exc()
+	except OSError:
+		print("osError " + osError)
+		print(traceback.print_exc())
 
 def main(argv):
 	initialyze(argv)
